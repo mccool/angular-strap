@@ -5,6 +5,7 @@
  * @author Olivier Louvignes (olivier@mg-crea.com)
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
+/* global angular */
 'use strict';
 angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions']).provider('$tooltip', function () {
   var defaults = this.defaults = {
@@ -35,7 +36,8 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions']).
     '$animate',
     'dimensions',
     '$$rAF',
-    function ($window, $rootScope, $compile, $q, $templateCache, $http, $animate, dimensions, $$rAF) {
+    '$parse',
+    function ($window, $rootScope, $compile, $q, $templateCache, $http, $animate, dimensions, $$rAF, $parse) {
       var trim = String.prototype.trim;
       var isTouch = 'createTouch' in $window.document;
       var htmlReplaceRegExp = /ng-bind="/gi;
@@ -46,12 +48,16 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions']).
         var options = $tooltip.$options = angular.extend({}, defaults, config);
         $tooltip.$promise = fetchTemplate(options.template);
         var scope = $tooltip.$scope = options.scope && options.scope.$new() || $rootScope.$new();
-        if (options.delay && angular.isString(options.delay)) {
-          var split = options.delay.split(',').map(parseFloat);
-          options.delay = split.length > 1 ? {
-            show: split[0],
-            hide: split[1]
-          } : split[0];
+        if (options.delay) {
+          if (angular.isObject($parse(options.delay)(scope))) {
+            options.delay = $parse(options.delay)(scope);
+          } else if (angular.isString(options.delay)) {
+            var split = options.delay.split(',').map(parseFloat);
+            options.delay = split.length > 1 ? {
+              show: split[0],
+              hide: split[1]
+            } : split[0];
+          }
         }
         // Support scope as string options
         if (options.title) {
