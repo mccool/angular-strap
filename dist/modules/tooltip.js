@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.0.5 - 2014-11-21
+ * @version v2.0.5 - 2015-02-24
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes (olivier@mg-crea.com)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -24,7 +24,8 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions']).
       show: false,
       title: '',
       type: '',
-      delay: 0
+      delay: 0,
+      autoClose: false
     };
   this.$get = [
     '$window',
@@ -162,6 +163,11 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions']).
               nodeName === 'button' && trigger !== 'hover' && element.off(isTouch ? 'touchstart' : 'mousedown', $tooltip.$onFocusElementMouseDown);
             }
           }
+          if ($tooltip.$isShown && tipElement !== null) {
+            if (options.autoClose) {
+              unbindAutoCloseEvents();
+            }
+          }
           // Remove element
           if (tipElement) {
             tipElement.remove();
@@ -230,6 +236,9 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions']).
               element.on('keyup', $tooltip.$onFocusKeyUp);
             }
           }
+          if (options.autoClose) {
+            bindAutoCloseEvents();
+          }
         };
         $tooltip.leave = function () {
           clearTimeout(timeout);
@@ -259,6 +268,9 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions']).
           // Unbind events
           if (options.keyboard && tipElement !== null) {
             tipElement.off('keyup', $tooltip.$onKeyUp);
+          }
+          if (options.autoClose && tipElement !== null) {
+            unbindAutoCloseEvents();
           }
         };
         $tooltip.toggle = function () {
@@ -294,6 +306,25 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions']).
           // Some browsers do not auto-focus buttons (eg. Safari)
           $tooltip.$isShown ? element[0].blur() : element[0].focus();
         };
+        var _autoCloseEventsBinded = false;
+        function bindAutoCloseEvents() {
+          // use timeout to hookup the events to prevent
+          // event bubbling from being processed imediately.
+          $timeout(function () {
+            // Stop propagation when clicking inside tooltip
+            tipElement.on('click', stopEventPropagation);
+            // Hide when clicking outside tooltip
+            $body.on('click', $tooltip.hide);
+            _autoCloseEventsBinded = true;
+          }, 0, false);
+        }
+        function unbindAutoCloseEvents() {
+          if (_autoCloseEventsBinded) {
+            tipElement.off('click', stopEventPropagation);
+            $body.off('click', $tooltip.hide);
+            _autoCloseEventsBinded = false;
+          }
+        }
         // Private methods
         function getPosition() {
           if (options.container === 'body') {

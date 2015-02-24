@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.0.5 - 2014-11-21
+ * @version v2.0.5 - 2015-02-24
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes (olivier@mg-crea.com)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -20,7 +20,8 @@ angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip']).provider('$
       html: false,
       title: '',
       content: '',
-      delay: 0
+      delay: 0,
+      autoClose: false
     };
   this.$get = [
     '$tooltip',
@@ -62,7 +63,8 @@ angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip']).provider('$
           'keyboard',
           'html',
           'animation',
-          'customClass'
+          'customClass',
+          'autoClose'
         ], function (key) {
           if (angular.isDefined(attr[key]))
             options[key] = attr[key];

@@ -21,7 +21,8 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions'])
       show: false,
       title: '',
       type: '',
-      delay: 0
+      delay: 0,
+      autoClose: false
     };
 
     this.$get = function($window, $rootScope, $compile, $q, $templateCache, $http, $animate, dimensions, $$rAF, $parse) {
@@ -165,6 +166,12 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions'])
             }
           }
 
+          if($tooltip.$isShown && tipElement !==null) {
+            if (options.autoClose) {
+              unbindAutoCloseEvents();
+            }
+          }
+
           // Remove element
           if(tipElement) {
             tipElement.remove();
@@ -237,6 +244,10 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions'])
             }
           }
 
+          if(options.autoClose) {
+            bindAutoCloseEvents();
+          }
+
         };
 
         $tooltip.leave = function() {
@@ -274,6 +285,10 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions'])
           // Unbind events
           if(options.keyboard && tipElement !== null) {
             tipElement.off('keyup', $tooltip.$onKeyUp);
+          }
+
+          if(options.autoClose && tipElement !== null) {
+            unbindAutoCloseEvents();
           }
 
         };
@@ -322,6 +337,29 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions'])
           // Some browsers do not auto-focus buttons (eg. Safari)
           $tooltip.$isShown ? element[0].blur() : element[0].focus();
         };
+
+        var _autoCloseEventsBinded = false;
+        function bindAutoCloseEvents() {
+          // use timeout to hookup the events to prevent
+          // event bubbling from being processed imediately.
+          $timeout(function() {
+            // Stop propagation when clicking inside tooltip
+            tipElement.on('click', stopEventPropagation);
+
+            // Hide when clicking outside tooltip
+            $body.on('click', $tooltip.hide);
+
+            _autoCloseEventsBinded = true;
+          }, 0, false);
+        }
+
+        function unbindAutoCloseEvents() {
+          if (_autoCloseEventsBinded) {
+            tipElement.off('click', stopEventPropagation);
+            $body.off('click', $tooltip.hide);
+            _autoCloseEventsBinded = false;
+          }
+        }
 
         // Private methods
 
