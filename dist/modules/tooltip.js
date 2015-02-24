@@ -134,7 +134,7 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions']).
             if (trigger === 'click') {
               $('body').on('click', function (evt) {
                 if (tipElement && !tipElement.find(evt.target).length && $tooltip.$isShown) {
-                  $tooltip.$toggle();
+                  $tooltip.toggle();
                 }
               });
               element.on('click', $tooltip.toggle);
@@ -278,7 +278,10 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions']).
             unbindAutoCloseEvents();
           }
         };
-        $tooltip.toggle = function () {
+        $tooltip.toggle = function (evt) {
+          if (evt) {
+            evt.stopImmediatePropagation();
+          }
           $tooltip.$isShown ? $tooltip.leave() : $tooltip.enter();
         };
         $tooltip.focus = function () {
