@@ -282,6 +282,9 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions']).
           if (evt) {
             evt.stopImmediatePropagation();
           }
+          if (tipElement && !tipElement.find(evt.target).length && $tooltip.$isShown) {
+            $tooltip.leave();
+          }
           $tooltip.$isShown ? $tooltip.leave() : $tooltip.enter();
         };
         $tooltip.focus = function () {
