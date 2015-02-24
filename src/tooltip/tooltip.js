@@ -130,7 +130,7 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions'])
           angular.forEach(triggers, function(trigger) {
             if(trigger === 'click') {
               $('body').on('click', function (evt) {
-                if (!tipContainer.find(evt.target).length && $tooltip.$isShown) {
+                if (tipElement && !tipElement.find(evt.target).length && $tooltip.$isShown) {
                   $tooltip.$toggle();
                 }
               });
