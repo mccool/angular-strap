@@ -132,6 +132,11 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.helpers.dimensions']).
           var triggers = options.trigger.split(' ');
           angular.forEach(triggers, function (trigger) {
             if (trigger === 'click') {
+              $('body').on('click', function (evt) {
+                if (!tipContainer.find(evt.target).length && $tooltip.$isShown) {
+                  $tooltip.$toggle();
+                }
+              });
               element.on('click', $tooltip.toggle);
             } else if (trigger !== 'manual') {
               element.on(trigger === 'hover' ? 'mouseenter' : 'focus', $tooltip.enter);
